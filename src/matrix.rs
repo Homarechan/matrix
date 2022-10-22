@@ -22,14 +22,15 @@ impl<T: Clone> Matrix<T> {
     }
 }
 
-impl<T, S> Add for Matrix<T>
+impl<S, T, U> Add<Matrix<T>> for Matrix<S>
 where
-    T: Clone + Add<Output = S>,
-    S: Clone,
+    S: Clone + Add<T, Output = U>,
+    T: Clone,
+    U: Clone,
 {
-    type Output = Option<Matrix<S>>;
+    type Output = Option<Matrix<U>>;
 
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: Matrix<T>) -> Self::Output {
         if self.rows != rhs.rows || self.cols != rhs.cols {
             None
         } else {
@@ -46,14 +47,15 @@ where
     }
 }
 
-impl<T, S> Sub for Matrix<T>
+impl<S, T, U> Sub<Matrix<T>> for Matrix<S>
 where
-    T: Clone + Sub<Output = S>,
-    S: Clone,
+    S: Clone + Sub<T, Output = U>,
+    T: Clone,
+    U: Clone,
 {
-    type Output = Option<Matrix<S>>;
+    type Output = Option<Matrix<U>>;
 
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: Matrix<T>) -> Self::Output {
         if self.rows != rhs.rows || self.cols != rhs.cols {
             None
         } else {
@@ -70,12 +72,13 @@ where
     }
 }
 
-impl<T> Neg for Matrix<T>
+impl<S, T> Neg for Matrix<S>
 where
-    T: Clone + Neg,
-    Vec<T>: FromIterator<<T as Neg>::Output>,
+    S: Clone + Neg<Output = T>,
+    T: Clone,
+    Vec<S>: FromIterator<<S as Neg>::Output>,
 {
-    type Output = Self;
+    type Output = Matrix<T>;
     fn neg(self) -> Self::Output {
         Matrix {
             rows: self.rows,
@@ -85,14 +88,15 @@ where
     }
 }
 
-impl<T, S> Mul for Matrix<T>
+impl<S, T, U> Mul<Matrix<T>> for Matrix<S>
 where
-    T: Clone + Mul<Output = S>,
-    S: Clone + Add<Output = S>,
+    S: Clone + Mul<T, Output = U>,
+    T: Clone,
+    U: Clone + Add<Output = U>,
 {
-    type Output = Option<Matrix<S>>;
+    type Output = Option<Matrix<U>>;
 
-    fn mul(self, rhs: Self) -> Self::Output {
+    fn mul(self, rhs: Matrix<T>) -> Self::Output {
         if self.cols != rhs.rows {
             None
         } else {
