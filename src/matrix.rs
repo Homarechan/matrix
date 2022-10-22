@@ -1,6 +1,5 @@
 use std::fmt;
 use std::ops::{Add, Mul, Neg, Sub};
-use std::process::Output;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub struct Matrix<T: Clone> {
@@ -23,7 +22,11 @@ impl<T: Clone> Matrix<T> {
     }
 }
 
-impl<S: Clone, T: Clone + Add<Output = S>> Add for Matrix<T> {
+impl<T, S> Add for Matrix<T>
+where
+    T: Clone + Add<Output = S>,
+    S: Clone,
+{
     type Output = Option<Matrix<S>>;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -43,7 +46,11 @@ impl<S: Clone, T: Clone + Add<Output = S>> Add for Matrix<T> {
     }
 }
 
-impl<S: Clone, T: Clone + Sub<Output = S>> Sub for Matrix<T> {
+impl<T, S> Sub for Matrix<T>
+where
+    T: Clone + Sub<Output = S>,
+    S: Clone,
+{
     type Output = Option<Matrix<S>>;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -63,8 +70,9 @@ impl<S: Clone, T: Clone + Sub<Output = S>> Sub for Matrix<T> {
     }
 }
 
-impl<T: Clone + Neg> Neg for Matrix<T>
+impl<T> Neg for Matrix<T>
 where
+    T: Clone + Neg,
     Vec<T>: FromIterator<<T as Neg>::Output>,
 {
     type Output = Self;
@@ -77,7 +85,11 @@ where
     }
 }
 
-impl<S: Clone + Add<Output = S>, T: Clone + Mul<Output = S>> Mul for Matrix<T> {
+impl<T, S> Mul for Matrix<T>
+where
+    T: Clone + Mul<Output = S>,
+    S: Clone + Add<Output = S>,
+{
     type Output = Option<Matrix<S>>;
 
     fn mul(self, rhs: Self) -> Self::Output {
