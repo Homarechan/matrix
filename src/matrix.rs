@@ -26,12 +26,12 @@ impl<T: Clone> Matrix<T> {
 impl<S: Clone, T: Clone + Add<Output = S>> Add for Matrix<T> {
     type Output = Option<Matrix<S>>;
 
-    fn add(self, other: Self) -> Self::Output {
-        if self.rows != other.rows || self.cols != other.cols {
+    fn add(self, rhs: Self) -> Self::Output {
+        if self.rows != rhs.rows || self.cols != rhs.cols {
             None
         } else {
             let mut v = Vec::new();
-            for (a, b) in self.values.iter().zip(other.values.iter()) {
+            for (a, b) in self.values.iter().zip(rhs.values.iter()) {
                 v.push(a.clone() + b.clone());
             }
             Some(Matrix {
