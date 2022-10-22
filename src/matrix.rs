@@ -1,45 +1,16 @@
 use std::fmt;
-use std::ops::{Add, Deref, Mul, Neg, Sub};
-
-#[derive(Clone)]
-struct String_(String);
-
-impl Deref for String_ {
-    type Target = String;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl Into<String_> for String {
-    fn into(self) -> String_ {
-        String_(self)
-    }
-}
-
-impl Add for String_ {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        String_ { 0: self.0 + &rhs.0 }
-    }
-}
-
-impl fmt::Display for String_ {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        String::fmt(&self.0, f)
-    }
-}
+use std::ops::{Add, Mul, Neg, Sub};
+use std::process::Output;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-struct Matrix<T: Clone> {
+pub struct Matrix<T: Clone> {
     pub rows: usize,
     pub cols: usize,
     values: Vec<T>,
 }
 
 impl<T: Clone> Matrix<T> {
-    fn new(rows: usize, cols: usize, v: Vec<T>) -> Option<Matrix<T>> {
+    pub fn new(rows: usize, cols: usize, v: Vec<T>) -> Option<Matrix<T>> {
         if v.len() != rows * cols {
             None
         } else {
@@ -52,8 +23,8 @@ impl<T: Clone> Matrix<T> {
     }
 }
 
-impl<T: Clone + Add<Output = T>> Add for Matrix<T> {
-    type Output = Option<Self>;
+impl<S: Clone, T: Clone + Add<Output = S>> Add for Matrix<T> {
+    type Output = Option<Matrix<S>>;
 
     fn add(self, other: Self) -> Self::Output {
         if self.rows != other.rows || self.cols != other.cols {
@@ -72,8 +43,8 @@ impl<T: Clone + Add<Output = T>> Add for Matrix<T> {
     }
 }
 
-impl<T: Clone + Sub<Output = T>> Sub for Matrix<T> {
-    type Output = Option<Self>;
+impl<S: Clone, T: Clone + Sub<Output = S>> Sub for Matrix<T> {
+    type Output = Option<Matrix<S>>;
 
     fn sub(self, rhs: Self) -> Self::Output {
         if self.rows != rhs.rows || self.cols != rhs.cols {
@@ -106,8 +77,8 @@ where
     }
 }
 
-impl<T: Clone + Mul<Output = T> + Add<Output = T>> Mul for Matrix<T> {
-    type Output = Option<Self>;
+impl<S: Clone + Add<Output = S>, T: Clone + Mul<Output = S>> Mul for Matrix<T> {
+    type Output = Option<Matrix<S>>;
 
     fn mul(self, rhs: Self) -> Self::Output {
         if self.cols != rhs.rows {
@@ -152,45 +123,4 @@ where
         s.pop().unwrap();
         write!(f, "{}", s)
     }
-}
-
-fn main() {
-    let m1 = Matrix::new(3, 3, vec![1, 2, 3, 4, 5, 6, 7, 8, 9]).unwrap();
-    let m2 = Matrix::new(3, 3, vec![9, 8, 7, 6, 5, 4, 3, 2, 1]).unwrap();
-
-    let m3 = m1.clone() + m2.clone();
-    println!("{}\n+\n{}\n=\n{}", m1, m2, m3.unwrap());
-
-    let m4 = m1.clone() - m2.clone();
-    println!("{}\n-\n{}\n=\n{}", m1, m2, m4.unwrap());
-
-    println!("{}", -m1.clone());
-
-    let m5 = m1.clone() * m2.clone();
-    println!("{}\n*\n{}\n=\n{}", m1, m2, m5.unwrap());
-
-    let m6: Matrix<String_> = Matrix::new(
-        2,
-        2,
-        vec![
-            "abc".to_string().into(),
-            "def".to_string().into(),
-            "ghi".to_string().into(),
-            "jkl".to_string().into(),
-        ],
-    )
-    .unwrap();
-    let m7: Matrix<String_> = Matrix::new(
-        2,
-        2,
-        vec![
-            "mno".to_string().into(),
-            "pqr".to_string().into(),
-            "stu".to_string().into(),
-            "vwx".to_string().into(),
-        ],
-    )
-    .unwrap();
-    let m8 = m6.clone() + m7.clone();
-    println!("{}\n+\n{}\n=\n{}", m6, m7, m8.unwrap());
 }
